@@ -4,7 +4,7 @@ public class Veiculo {
 
     public Veiculo(String placa) {
         this.placa = placa;
-        this.usos = new UsodeVaga[100];
+        this.usos = new UsodeVaga[500];
     }
 
     public void estacionar(Vaga vaga) {
@@ -20,7 +20,7 @@ public class Veiculo {
         double total = 0;
         for (int i = 0; i < usos.length; i++) {
             if (usos[i] != null) {
-                total += usos[i].getVaga().getPreco();
+                total += usos[i].getVaga().getValorPago();
                 usos[i] = null;
             }
         }
@@ -31,7 +31,7 @@ public class Veiculo {
         double total = 0;
         for (int i = 0; i < usos.length; i++) {
             if (usos[i] != null) {
-                total += usos[i].getVaga().getPreco();
+                total += usos[i].getVaga().getValorPago();
             }
         }
         return total;
@@ -41,7 +41,7 @@ public class Veiculo {
         double total = 0;
         for (int i = 0; i < usos.length; i++) {
             if (usos[i] != null && usos[i].getVaga().getMes() == mes) {
-                total += usos[i].getVaga().getPreco();
+                total += usos[i].getVaga().getValorPago();
             }
         }
         return total;

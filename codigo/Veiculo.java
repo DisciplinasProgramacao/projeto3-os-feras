@@ -1,16 +1,16 @@
 public class Veiculo {
     private String placa;
-    private UsodeVaga[] usos;
+    private UsoDeVaga[] usos;
 
     public Veiculo(String placa) {
         this.placa = placa;
-        this.usos = new UsodeVaga[500];
+        this.usos = new UsoDeVaga[500];
     }
 
     public void estacionar(Vaga vaga) {
         for (int i = 0; i < usos.length; i++) {
             if (usos[i] == null) {
-                usos[i] = new UsodeVaga(vaga);
+                usos[i] = new UsoDeVaga(vaga);
                 break;
             }
         }
@@ -56,4 +56,3 @@ public class Veiculo {
         }
         return total;
     }
-}

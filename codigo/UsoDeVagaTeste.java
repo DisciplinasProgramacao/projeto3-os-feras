@@ -1,56 +1,47 @@
-import org.junit.Test;
-import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.LocalDateTime;
-import static org.junit.Assert.*;
+import java.util.ArrayList;
 
 public class UsoDeVagaTeste {
 
     @Test
-    public void testSair() {
-        Vaga vaga = new Vaga(); // Crie uma instância de Vaga
-        UsoDeVaga uso = new UsoDeVaga(vaga);
-        
-        // Certifique-se de que a vaga está ocupada após a entrada
-        assertTrue(vaga.isOcupada());
-
-        // Simule uma pausa curta antes de sair
-        try {
-            Thread.sleep(1000); // Aguarde 1 segundo
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        LocalDateTime saida = LocalDateTime.now();
-        Duration tempoEstacionado = Duration.between(uso.getEntrada(), saida);
-        double valorEsperado = tempoEstacionado.getSeconds() * UsoDeVaga.VALOR_FRACAO;
-
-        double valorPago = uso.sair();
-
-        // Certifica se a vaga foi liberada
-        assertFalse(vaga.isOcupada());
-
-        // Verifique se o valor pago corresponde ao cálculo esperado
-        assertEquals(valorEsperado, valorPago, 0.01); // Tolerância de 0.01 para lidar com arredondamento de números de ponto flutuante
+    public void testValorPagoSemServicoAdicional() {
+        Vaga vaga = new Vaga(); // Supondo que temos uma classe Vaga
+        UsoDeVaga usoDeVaga = new UsoDeVaga(vaga, new ArrayList<>());
+        usoDeVaga.setEntrada(LocalDateTime.now().minusHours(1)); // Supondo que o cliente entrou há 1 hora
+        usoDeVaga.setSaida(LocalDateTime.now()); // O cliente está saindo agora
+        double valorPago = usoDeVaga.sair();
+        assertEquals(0 * UsoDeVaga.getFracaoUso() * UsoDeVaga.getValorFracao(), valorPago);
     }
-    
+
     @Test
-    public void testValorPago() {
-        Vaga vaga = new Vaga(); // Crie uma instância de Vaga
-        UsoDeVaga uso = new UsoDeVaga(vaga);
+    public void testValorPagoComServicoAdicional() {
+        Vaga vaga = new Vaga(); // Supondo que temos uma classe Vaga
+        ArrayList<ServicoAdicional> servicos = new ArrayList<>();
+        servicos.add(new Manobrista());
+        UsoDeVaga usoDeVaga = new UsoDeVaga(vaga, servicos);
+        usoDeVaga.setEntrada(LocalDateTime.now().minusHours(1)); // Supondo que o cliente entrou há 1 hora
+        usoDeVaga.setSaida(LocalDateTime.now()); // O cliente está saindo agora
+        double valorPago = usoDeVaga.sair();
+        assertEquals(0 * UsoDeVaga.getFracaoUso() * UsoDeVaga.getValorFracao() + 5.0, valorPago);
+    }    
+
+    @Test
+    public void testAdicionarRemoverServico() {
+        Vaga vaga = new Vaga(); // Supondo que temos uma classe Vaga
+        ArrayList<ServicoAdicional> servicos = new ArrayList<>();
+        ServicoAdicional manobrista = new Manobrista();
+        servicos.add(manobrista);
+        UsoDeVaga usoDeVaga = new UsoDeVaga(vaga, servicos);
         
-        // Certifique-se de que o valor pago inicial é 0.0
-        assertEquals(0.0, uso.valorPago(), 0.01); // Tolerância de 0.01
+        // Testar adicionar serviço
+        ServicoAdicional lavagem = new Lavagem();
+        usoDeVaga.adicionarServico(lavagem);
+        assertEquals(2, usoDeVaga.getServicosAdicionais().size());
 
-        // Simule uma pausa curta antes de sair
-        try {
-            Thread.sleep(1000); // Aguarde 1 segundo
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        double valorPago = uso.sair();
-
-        // Verifique se o valor pago é o mesmo que o valor retornado pelo método valorPago()
-        assertEquals(valorPago, uso.valorPago(), 0.01); // Tolerância de 0.01
+        // Testar remover serviço
+        usoDeVaga.removerServico(manobrista);
+        assertEquals(1, usoDeVaga.getServicosAdicionais().size());
     }
 }

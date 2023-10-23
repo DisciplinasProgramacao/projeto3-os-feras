@@ -10,6 +10,7 @@ public class Estacionamento {
     private int quantFileiras;
     private int vagasPorFileira;
     private Cliente[] id;
+    private Cliente[] clientes;
 
     public Estacionamento(String nome, Cliente[] id, List<Vaga> vagas, int quantFileiras, int vagasPorFileira) {
         this.nome = nome;
@@ -19,10 +20,10 @@ public class Estacionamento {
         this.vagasPorFileira = vagasPorFileira;
     }
 
-    public String addVeiculo(Veiculo veiculo, String idCli) {
+    public String addVeiculo(Veiculo veiculo, Object object) {
         Cliente clienteEncontrado = null;
         for (Cliente cliente : id) {
-            if (cliente.getId().equals(idCli)) {
+            if (cliente.getId().equals(object)) {
                 clienteEncontrado = cliente;
                 break;
             }
@@ -35,36 +36,35 @@ public class Estacionamento {
             return "Cliente não encontrado.";
         }
     }
-   
-   
-    public void addCliente(String nome, String id){
-        if(clienteJaExiste(id)){
 
-        } else{
-            cliente.add(new Cliente(nome,id));
+    public void addCliente(String nome, Object object) {
+        if (clienteJaExiste(object)) {
+
+        } else {
+            cliente.add(new Cliente(nome, (String) object));
         }
     }
-   
-    private boolean clienteJaExiste(String id) {
-        for (Cliente c : cliente){
-            if(c.getId().equals(id)){
+
+    boolean clienteJaExiste(Object object) {
+        for (Cliente c : cliente) {
+            if (c.getId().equals(object)) {
                 return true;
             }
         }
         return false;
     }
-    
-    public void addVagas(String id, boolen disponivel) {
-        if(vagaJaExiste(id)){
 
-        } else{
+    public void addVagas(String id, boolean disponivel) {
+        if (vagaJaExiste(id)) {
+
+        } else {
             vagas.add(new Vaga(id, disponivel));
         }
     }
 
-    private boolean vagaJaExiste(String id){
-        for(Vaga v : vagas){
-            if(v.getId().equals(id)){
+    private boolean vagaJaExiste(String id) {
+        for (Vaga v : vagas) {
+            if (v.getId().equals(id)) {
                 return true;
             }
         }
@@ -74,7 +74,7 @@ public class Estacionamento {
     private void gerarVagas() {
         int totalVagas = quantFileiras * vagasPorFileira;
         vagas = new ArrayList<>();
-    
+
         for (int fila = 1; fila <= quantFileiras; fila++) {
             for (int numero = 1; numero <= vagasPorFileira; numero++) {
                 Vaga vaga = new Vaga(fila, numero);
@@ -89,18 +89,18 @@ public class Estacionamento {
         VEICULO_NAO_ENCONTRADO,
         SEM_VAGAS_DISPONIVEIS
     }
-    
-    public EstacionamentoStatus estacionar(String placa) {
+
+    public EstacionamentoStatus estacionar(Object object) {
         for (Vaga vaga : vagas) {
             if (vaga.disponivel()) {
                 Veiculo veiculo = null;
                 for (Cliente cliente : id) {
-                    veiculo = cliente.possuiVeiculo(placa);
+                    veiculo = cliente.possuiVeiculo(object);
                     if (veiculo != null) {
                         break;
                     }
                 }
-    
+
                 if (veiculo != null) {
                     boolean sucesso = veiculo.estacionar(vaga);
                     if (sucesso) {
@@ -114,11 +114,11 @@ public class Estacionamento {
             }
         }
         return EstacionamentoStatus.SEM_VAGAS_DISPONIVEIS;
-    }  
+    }
 
-    public double sair(String placa) {
+    public double sair(Object object) {
         for (Cliente cliente : id) {
-            Veiculo veiculo = cliente.possuiVeiculo(placa);
+            Veiculo veiculo = cliente.possuiVeiculo(object);
             if (veiculo != null) {
                 UsoDeVaga[] usos = veiculo.getUsosDeVaga();
                 for (UsoDeVaga uso : usos) {
@@ -129,9 +129,8 @@ public class Estacionamento {
                 }
             }
         }
-        return -1.0; 
+        return -1.0;
     }
-    
 
     public double totalArrecadado() {
         double totalArrecadado = 0.0;
@@ -143,7 +142,6 @@ public class Estacionamento {
         }
         return totalArrecadado;
     }
-    
 
     public double arrecadacaoNoMes(int mes) {
         double arrecadacaoNoMes = 0.0;
@@ -158,37 +156,30 @@ public class Estacionamento {
         }
         return arrecadacaoNoMes;
     }
-    
 
     public double valorMedioPorUso() {
-        if (id != null) {
-            double totalValorPago = 0.0;
-            int totalUsos = 0;
+        double totalValorPago = 0.0;
+        int totalUsos = 0;
     
-            for (Cliente cliente : id) {
-                if (cliente.getVeiculos() != null) {
-                    for (Veiculo veiculo : cliente.getVeiculos()) {
-                        if (veiculo.getUsosDeVaga() != null) {
-                            for (UsoDeVaga uso : veiculo.getUsosDeVaga()) {
-                                totalValorPago += uso.valorPago();
-                                totalUsos++;
-                            }
-                        }
+        for (Cliente cliente : clientes) {
+            for (Veiculo veiculo : cliente.getVeiculos()) {
+                UsoDeVaga[] usos = veiculo.getUsosDeVaga();
+                if (usos != null) {
+                    for (UsoDeVaga uso : usos) {
+                        totalValorPago += uso.valorPago();
+                        totalUsos++;
                     }
                 }
             }
+        }
     
-            if (totalUsos > 0) {
-                return totalValorPago / totalUsos;
-            } else {
-                // Retorna -1.0 quando não há usos registrados.
-                return -1.0;
-            }
+        if (totalUsos > 0) {
+            return totalValorPago / totalUsos;
         } else {
-            // Retorna -1.0 quando não há clientes cadastrados.
             return -1.0;
         }
     }
+    
     
 
     public String top5Clientes(int mes) {

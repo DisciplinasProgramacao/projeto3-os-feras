@@ -19,7 +19,7 @@ public class Estacionamento {
         this.vagasPorFileira = vagasPorFileira;
     }
 
-    public void addVeiculo(Veiculo veiculo, String idCli) throws ClienteNaoEncontradoException {
+    public String addVeiculo(Veiculo veiculo, String idCli) {
         Cliente clienteEncontrado = null;
         for (Cliente cliente : id) {
             if (cliente.getId().equals(idCli)) {
@@ -27,11 +27,12 @@ public class Estacionamento {
                 break;
             }
         }
-    
+
         if (clienteEncontrado != null) {
             clienteEncontrado.addVeiculo(veiculo);
+            return "Veículo adicionado com sucesso.";
         } else {
-            throw new Exception("Cliente nao encontrado.");
+            return "Cliente não encontrado.";
         }
     }
    

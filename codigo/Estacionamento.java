@@ -1,14 +1,17 @@
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Estacionamento {
 
     private String nome;
-    private Cliente[] id;
-    private Vaga[] vagas;
+    private List<Cliente> cliente = new ArrayList<>();
+    private List<Vaga> vagas = new ArrayList<>();
     private int quantFileiras;
     private int vagasPorFileira;
+    private Cliente[] id;
 
-    public Estacionamento(String nome, Cliente[] id, Vaga[] vagas, int quantFileiras, int vagasPorFileira) {
+    public Estacionamento(String nome, Cliente[] id, List<Vaga> vagas, int quantFileiras, int vagasPorFileira) {
         this.nome = nome;
         this.id = id;
         this.vagas = vagas;
@@ -16,7 +19,7 @@ public class Estacionamento {
         this.vagasPorFileira = vagasPorFileira;
     }
 
-    public void addVeiculo(Veiculo veiculo, String idCli) {
+    public void addVeiculo(Veiculo veiculo, String idCli) throws ClienteNaoEncontradoException {
         Cliente clienteEncontrado = null;
         for (Cliente cliente : id) {
             if (cliente.getId().equals(idCli)) {
@@ -24,60 +27,71 @@ public class Estacionamento {
                 break;
             }
         }
-
+    
         if (clienteEncontrado != null) {
             clienteEncontrado.addVeiculo(veiculo);
         } else {
-            System.out.println("Cliente não encontrado com o ID especificado: " + idCli);
+            throw new Exception("Cliente nao encontrado.");
+        }
+    }
+   
+   
+    public void addCliente(String nome, String id){
+        if(clienteJaExiste(id)){
+
+        } else{
+            cliente.add(new Cliente(nome,id));
+        }
+    }
+   
+    private boolean clienteJaExiste(String id) {
+        for (Cliente c : cliente){
+            if(c.getId().equals(id)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void addVagas(String id, boolen disponivel) {
+        if(vagaJaExiste(id)){
+
+        } else{
+            vagas.add(new Vaga(id, disponivel));
         }
     }
 
-    public void addCliente(Cliente cliente) {
-        if (id != null) {
-            boolean clienteExistente = false;
-            for (Cliente existingCliente : id) {
-                if (existingCliente.getId().equals(cliente.getId())) {
-                    clienteExistente = true;
-                    break;
-                }
+    private boolean vagaJaExiste(String id){
+        for(Vaga v : vagas){
+            if(v.getId().equals(id)){
+                return true;
             }
-
-            if (!clienteExistente) {
-                Cliente[] novoId = new Cliente[id.length + 1];
-                System.arraycopy(id, 0, novoId, 0, id.length);
-                novoId[novoId.length - 1] = cliente;
-                id = novoId;
-            } else {
-                System.out.println("O cliente já existe na lista.");
-            }
-        } else {
-            id = new Cliente[] { cliente };
         }
-    }
-
-    public void addVagas(Vaga[] novasVagas) {
+        return false;
     }
 
     private void gerarVagas() {
         int totalVagas = quantFileiras * vagasPorFileira;
-        vagas = new Vaga[totalVagas];
-
-        int vagaId = 1;
-
+        vagas = new ArrayList<>();
+    
         for (int fila = 1; fila <= quantFileiras; fila++) {
             for (int numero = 1; numero <= vagasPorFileira; numero++) {
                 Vaga vaga = new Vaga(fila, numero);
-                vagas[vagaId - 1] = vaga;
-                vagaId++;
+                vagas.add(vaga);
             }
         }
     }
 
-    public void estacionar(String placa) {
+    public enum EstacionamentoStatus {
+        SUCCESS,
+        VAGA_OCUPADA,
+        VEICULO_NAO_ENCONTRADO,
+        SEM_VAGAS_DISPONIVEIS
+    }
+    
+    public EstacionamentoStatus estacionar(String placa) {
         for (Vaga vaga : vagas) {
             if (vaga.disponivel()) {
-                // Encontrou uma vaga disponível, agora você precisa associar o veículo a essa
-                // vaga.
                 Veiculo veiculo = null;
                 for (Cliente cliente : id) {
                     veiculo = cliente.possuiVeiculo(placa);
@@ -85,23 +99,21 @@ public class Estacionamento {
                         break;
                     }
                 }
-
+    
                 if (veiculo != null) {
                     boolean sucesso = veiculo.estacionar(vaga);
                     if (sucesso) {
-                        System.out.println("Veículo com placa " + placa + " estacionado na vaga " + vaga.getId());
+                        return EstacionamentoStatus.SUCCESS;
                     } else {
-                        System.out.println("A vaga " + vaga.getId() + " já está ocupada.");
+                        return EstacionamentoStatus.VAGA_OCUPADA;
                     }
-                    return;
                 } else {
-                    System.out.println("Veículo com placa " + placa + " não encontrado nos clientes.");
-                    return;
+                    return EstacionamentoStatus.VEICULO_NAO_ENCONTRADO;
                 }
             }
         }
-        System.out.println("Não há vagas disponíveis para estacionar o veículo com placa " + placa);
-    }
+        return EstacionamentoStatus.SEM_VAGAS_DISPONIVEIS;
+    }  
 
     public double sair(String placa) {
         for (Cliente cliente : id) {
@@ -111,14 +123,12 @@ public class Estacionamento {
                 for (UsoDeVaga uso : usos) {
                     if (uso.sair()) {
                         double valorPago = uso.valorPago();
-                        System.out.println("Veículo com placa " + placa + " saiu da vaga " + uso.getVaga().getId() + " e o valor a ser pago é: R$" + valorPago);
                         return valorPago;
                     }
                 }
             }
         }
-        System.out.println("Veículo com placa " + placa + " não foi encontrado ou não está estacionado em nenhuma vaga.");
-        return 0.0; 
+        return -1.0; 
     }
     
 
@@ -149,11 +159,11 @@ public class Estacionamento {
     }
     
 
-    public double valorMedioPorUso() {
+    public double valorMedioPorUso() throws NenhumUsoRegistradoException, NenhumClienteCadastradoException {
         if (id != null) {
             double totalValorPago = 0.0;
             int totalUsos = 0;
-
+    
             for (Cliente cliente : id) {
                 for (Veiculo veiculo : cliente.getVeiculos()) {
                     for (UsoDeVaga uso : veiculo.getUsosDeVaga()) {
@@ -162,18 +172,17 @@ public class Estacionamento {
                     }
                 }
             }
-
+    
             if (totalUsos > 0) {
                 return totalValorPago / totalUsos;
             } else {
-                System.out.println("Nenhum uso de vaga registrado.");
-                return 0.0;
+                throw new Exception("Nenhum uso registrado encontrado.");
             }
         } else {
-            System.out.println("Nenhum cliente cadastrado.");
-            return 0.0;
+            throw new Exception("Nenhum cliente cadastrado.");
         }
     }
+    
 
     public String top5Clientes(int mes) {
         Cliente[] topClientes = new Cliente[5];

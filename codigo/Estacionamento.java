@@ -159,16 +159,20 @@ public class Estacionamento {
     }
     
 
-    public double valorMedioPorUso() throws NenhumUsoRegistradoException, NenhumClienteCadastradoException {
+    public double valorMedioPorUso() {
         if (id != null) {
             double totalValorPago = 0.0;
             int totalUsos = 0;
     
             for (Cliente cliente : id) {
-                for (Veiculo veiculo : cliente.getVeiculos()) {
-                    for (UsoDeVaga uso : veiculo.getUsosDeVaga()) {
-                        totalValorPago += uso.valorPago();
-                        totalUsos++;
+                if (cliente.getVeiculos() != null) {
+                    for (Veiculo veiculo : cliente.getVeiculos()) {
+                        if (veiculo.getUsosDeVaga() != null) {
+                            for (UsoDeVaga uso : veiculo.getUsosDeVaga()) {
+                                totalValorPago += uso.valorPago();
+                                totalUsos++;
+                            }
+                        }
                     }
                 }
             }
@@ -176,10 +180,12 @@ public class Estacionamento {
             if (totalUsos > 0) {
                 return totalValorPago / totalUsos;
             } else {
-                throw new Exception("Nenhum uso registrado encontrado.");
+                // Retorna -1.0 quando não há usos registrados.
+                return -1.0;
             }
         } else {
-            throw new Exception("Nenhum cliente cadastrado.");
+            // Retorna -1.0 quando não há clientes cadastrados.
+            return -1.0;
         }
     }
     

@@ -30,7 +30,7 @@ public class EstacionamentoTeste {
 
     @Test
     public void testEstacionar() {
-        Estacionamento.EstacionamentoStatus status = estacionamento.estacionar("ID1");
+        Estacionamento status = estacionamento.estacionar("ID1");
         assertEquals(Estacionamento.EstacionamentoStatus.SUCCESS, status);
 
         // Teste de estacionar em vaga ocupada
@@ -96,5 +96,3 @@ public class EstacionamentoTeste {
         return new Estacionamento("Meu Estacionamento", clientes, vagas, 2, 2);
     }
 }
-
-

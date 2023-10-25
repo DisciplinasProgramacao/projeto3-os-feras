@@ -1,30 +1,60 @@
 public class Veiculo {
+    private String placa;
+    private UsodeVaga[] usos;
 
-	private String placa;
-	private UsoDeVaga[] usos;
+    public Veiculo(String placa) {
+        this.placa = placa;
+        this.usos = new UsodeVaga[500];
+    }
 
-	public Veiculo(String placa) {
+    public void estacionar(Vaga vaga) throws VeiculoException {
+        for (int i = 0; i < usos.length; i++) {
+            if (usos[i] == null) {
+                usos[i] = new UsoDeVaga(vaga);
+                return; // Estacionamento bem-sucedido, retornar sem exceção
+            }
+        }
+        throw new VeiculoException("Não foi possível estacionar. Não há vagas disponíveis.");
+    }
 
-	}
+    public double sair() {
+        double total = 0;
+        for (int i = 0; i < usos.length; i++) {
+            if (usos[i] != null) {
+                total += usos[i].getVaga().getValorPago();
+                usos[i] = null;
+            }
+        }
+        return total;
+    }
 
-	public void estacionar(Vaga vaga) {
+    public double totalArrecadado() {
+        double total = 0;
+        for (int i = 0; i < usos.length; i++) {
+            if (usos[i] != null) {
+                total += usos[i].getVaga().getValorPago();
+            }
+        }
+        return total;
+    }
 
-	}
+    public double arrecadadoNoMes(int mes) {
+        double total = 0;
+        for (int i = 0; i < usos.length; i++) {
+            if (usos[i] != null && usos[i].getVaga().getMes() == mes) {
+                total += usos[i].getVaga().getValorPago();
+            }
+        }
+        return total;
+    }
 
-	public double sair() {
-
-	}
-
-	public double totalArrecadado() {
-
-	}
-
-	public double arrecadadoNoMes(int mes) {
-
-	}
-
-	public int totalDeUsos() {
-
-	}
-
+    public int totalDeUsos() {
+        int total = 0;
+        for (int i = 0; i < usos.length; i++) {
+            if (usos[i] != null) {
+                total++;
+            }
+        }
+        return total;
+    }
 }

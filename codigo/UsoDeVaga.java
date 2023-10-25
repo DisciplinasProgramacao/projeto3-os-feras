@@ -1,108 +1,92 @@
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
 
-public class UsoDeVaga implements Serializable {
+public class UsoDeVaga {
 
-    private static final double FRACAO_USO = 0.25;
-    private static final double VALOR_FRACAO = 4.0;
-    private static final double VALOR_MAXIMO = 50.0;
-    private Vaga vaga;
-    private LocalDateTime entrada;
-    private LocalDateTime saida;
-    private double valorPago;
-    private List<ServicoAdicional> servicosAdicionais;
+	private static final double FRACAO_USO = 0.25;
+	private static final double VALOR_FRACAO = 4.0;
+	private static final double VALOR_MAXIMO = 50.0;
+	private Vaga vaga;
+	private LocalDateTime entrada;
+	private LocalDateTime saida;
+	private double valorPago;
+	private Servico servico; //novo atributo
 
-    public UsoDeVaga(Vaga vaga, List<ServicoAdicional> servicosAdicionais) {
-        this.vaga = vaga;
-        this.entrada = LocalDateTime.now();
-        this.saida = null;
-        this.valorPago = 0.0;
-        this.servicosAdicionais = new ArrayList<>(servicosAdicionais);
-    }
+	//enum para representar os serviços disponíveis
+	public enum Servico {
+		MANOBRISTA(5.0), //sem tempo determinado
+		LAVAGEM(20.0), //1 hora
+		POLIMENTO(45.0); //2 horas
 
-    public double sair() {
-        this.saida = LocalDateTime.now();
-        this.calcularValorPago();
-        vaga.setOcupada(false);
-        return this.valorPago;
-    }
+		private double precoPorHora; //preço por hora do serviço
 
-    private void calcularValorPago() {
-        double valorBase = calcularValorBase();
-        double valorServicos = calcularValorServicosAdicionais();
-        this.valorPago = Math.min(valorBase + valorServicos, VALOR_MAXIMO);
-    }
+		//construtor do enum
+		private Servico(double precoPorHora) {
+			this.precoPorHora = precoPorHora;
+		}
 
-    private double calcularValorBase() {
-        long minutos = entrada.until(saida, java.time.temporal.ChronoUnit.MINUTES);
-        double valorBase = minutos * FRACAO_USO * VALOR_FRACAO;
-        return valorBase;
-    }
+		//método para obter o preço por hora do serviço
+		public double getPrecoPorHora() {
+			return this.precoPorHora;
+		}
+	}
 
-    private double calcularValorServicosAdicionais() {
-        double valorServicos = 0.0;
-        for (ServicoAdicional servico : servicosAdicionais) {
-            valorServicos += servico.calcularValor();
+	//construtor original
+	public UsoDeVaga(Vaga vaga) throws UsoDeVagaException {
+        //verificar se a vaga está ocupada
+        if (vaga.isOcupada()) {
+            //lançar uma exceção com a mensagem adequada
+            throw new UsoDeVagaException("Estacionar em uma vaga sem haver finalizado o uso anterior");
         }
-        return valorServicos;
-    }
+		this.vaga=vaga;
+		this.entrada=LocalDateTime.now();//atribuir data e hora atual como entrada do cliente na vaga
+		this.saida=null;
+		this.valorPago=0.0;
+		this.servico=null; //sem serviço
 
-    public double valorPago() {
+	}
+
+	//construtor sobrecarregado que recebe um serviço
+	public UsoDeVaga(Vaga vaga, Servico servico) throws UsoDeVagaException {
+		this(vaga); //chamar o construtor original
+		this.servico=servico; //atribuir o serviço
+	}
+
+//registrar saida e retornar ao valor pago 
+	public double sair() throws UsoDeVagaException {
+        //verificar se a saída já foi registrada
+        if (this.saida != null) {
+            //lançar uma exceção com a mensagem adequada
+            throw new UsoDeVagaException("Sair de uma vaga cujo uso já foi finalizado");
+        }
+		this.saida=LocalDateTime.now();//atribuir data e hora atual como entrada do cliente na vaga
+		this.valorPago=valorPago();//calcular valor pagopelo cliente
+		vaga.setOcupada(false);//liberar vaga
+		return this.valorPago;
+	}
+
+	//retornar valor pago pelo uso da vaga
+	public double valorPago() {
+		
+        //calcular o tempo de uso da vaga em horas
+        long tempo = ChronoUnit.HOURS.between(entrada, saida);
+
+        //se houver um serviço escolhido, adicionar o seu preço ao valor pago
+        if (servico != null) {
+            this.valorPago += servico.getPrecoPorHora();
+        }
+
+        //se o tempo de uso for menor que uma fração, cobrar apenas a fração
+        if (tempo < FRACAO_USO) {
+            this.valorPago += VALOR_FRACAO;
+        }
+        //se o tempo de uso for maior que uma fração, cobrar por cada fração usada até o valor máximo
+        else {
+            this.valorPago += Math.min((tempo / FRACAO_USO) * VALOR_FRACAO, VALOR_MAXIMO);
+        }
+
         return this.valorPago;
+
     }
 
-    public void adicionarServico(ServicoAdicional servico) {
-        servicosAdicionais.add(servico);
-    }
-
-    public void removerServico(ServicoAdicional servico) {
-        servicosAdicionais.remove(servico);
-    }
-}
-
-abstract class ServicoAdicional implements Serializable {
-    protected double valor;
-    protected int tempoMinimoPermanencia;
-
-    public ServicoAdicional(double valor, int tempoMinimoPermanencia) {
-        this.valor = valor;
-        this.tempoMinimoPermanencia = tempoMinimoPermanencia;
-    }
-
-    public abstract double calcularValor();
-}
-
-class Manobrista extends ServicoAdicional {
-    public Manobrista() {
-        super(5.0, 0);
-    }
-
-    @Override
-    public double calcularValor() {
-        return this.valor;
-    }
-}
-
-class Lavagem extends ServicoAdicional {
-    public Lavagem() {
-        super(20.0, 60); // 60 minutos = 1 hora
-    }
-
-    @Override
-    public double calcularValor() {
-        return this.valor;
-    }
-}
-
-class Polimento extends ServicoAdicional {
-    public Polimento() {
-        super(45.0, 120); // 120 minutos = 2 horas
-    }
-
-    @Override
-    public double calcularValor() {
-        return this.valor;
-    }
 }

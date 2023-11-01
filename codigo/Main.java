@@ -75,16 +75,9 @@ public class Main {
     private static void saidaEstacionamento(Scanner scanner, Estacionamento estacionamento) {
         System.out.println("Digite a placa do veículo:");
         String placaVeiculo = scanner.nextLine();
-        Cliente clienteSaida = estacionamento.buscarClientePorPlaca(placaVeiculo);
-
-        if (clienteSaida != null) {
-            Veiculo veiculoCliente = clienteSaida.getVeiculoPorPlaca(placaVeiculo);
-            double valor = estacionamento.sair(veiculoCliente.getPlaca());
-            System.out.println("Cliente " + clienteSaida.getNome() + " saiu do estacionamento com placa " +
-                    veiculoCliente.getPlaca() + ". O valor a ser pago é R$ " + valor + ".");
-        } else {
-            System.out.println("O veículo com a placa " + placaVeiculo + " não está no estacionamento.");
-        }
+        estacionamento.sair(placaVeiculo);
+             System.out.println("O veículo com a placa " + placaVeiculo + " não está no estacionamento.");
+         }
     }
 
     private static void consultarVagasDisponiveis(Estacionamento estacionamento) {

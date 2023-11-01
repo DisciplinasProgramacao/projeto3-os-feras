@@ -1,20 +1,23 @@
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 public class Veiculo {
     private String placa;
-    private List<HistoricoVaga> historicoVagas; // Lista para armazenar o histórico
+    private List<UsoDeVaga> historicoVagas; // Lista para armazenar o histórico
+    private Date dataEntrada;
 
     public Veiculo(String placa) {
         this.placa = placa;
         this.historicoVagas = new ArrayList<>();
+        this.dataEntrada = new Date();
     }
 
     public void estacionar(Vaga vaga) throws VeiculoException {
-        for (HistoricoVaga historico : historicoVagas) {
-            if (historico.getUsoDeVaga() == null) {
-                historico.setUsoDeVaga(new UsoDeVaga(vaga));
+        for (UsoDeVaga uso : historicoVagas) {
+            if (uso.getVaga() == null) {
+                uso.setVaga(vaga);
+                uso.setDataEntrada(new Date());
                 return; // Estacionamento bem-sucedido, retornar sem exceção
             }
         }
@@ -23,24 +26,28 @@ public class Veiculo {
 
     public double sair() {
         double total = 0;
-        for (HistoricoVaga historico : historicoVagas) {
-            UsoDeVaga uso = historico.getUsoDeVaga();
-            if (uso != null) {
-                total += uso.getVaga().getValorPago();
-                uso.getVaga().setValorPago(0); // Zerar o valor da vaga após a saída
-                uso.setDataSaida(new Date()); // Registrar a data de saída
-                historico.setUsoDeVaga(null); // Remover o uso da vaga do histórico
+        Date dataSaida = new Date();
+
+        for (UsoDeVaga uso : historicoVagas) {
+            Vaga vaga = uso.getVaga();
+            if (vaga != null) {
+                vaga.setValorPago(0); // Zerar o valor da vaga após a saída
+                uso.setDataSaida(dataSaida); // Registrar a data de saída
+                total += vaga.getValorPago();
             }
         }
+
+        historicoVagas.clear(); // Limpar o histórico de vagas
+
         return total;
     }
 
     public double totalArrecadado() {
         double total = 0;
-        for (HistoricoVaga historico : historicoVagas) {
-            UsoDeVaga uso = historico.getUsoDeVaga();
-            if (uso != null) {
-                total += uso.getVaga().getValorPago();
+        for (UsoDeVaga uso : historicoVagas) {
+            Vaga vaga = uso.getVaga();
+            if (vaga != null) {
+                total += vaga.getValorPago();
             }
         }
         return total;
@@ -48,44 +55,16 @@ public class Veiculo {
 
     public double arrecadadoNoMes(int mes) {
         double total = 0;
-        for (HistoricoVaga historico : historicoVagas) {
-            UsoDeVaga uso = historico.getUsoDeVaga();
-            if (uso != null && uso.getVaga().getMes() == mes) {
-                total += uso.getVaga().getValorPago();
+        for (UsoDeVaga uso : historicoVagas) {
+            Vaga vaga = uso.getVaga();
+            if (vaga != null && vaga.getMes() == mes) {
+                total += vaga.getValorPago();
             }
         }
         return total;
     }
 
     public int totalDeUsos() {
-        int total = 0;
-        for (HistoricoVaga historico : historicoVagas) {
-            if (historico.getUsoDeVaga() != null) {
-                total++;
-            }
-        }
-        return total;
-    }
-}
-
-class HistoricoVaga {
-    private UsoDeVaga usoDeVaga;
-    private Date dataEntrada;
-
-    public HistoricoVaga() {
-        this.usoDeVaga = null;
-        this.dataEntrada = new Date();
-    }
-
-    public UsoDeVaga getUsoDeVaga() {
-        return usoDeVaga;
-    }
-
-    public void setUsoDeVaga(UsoDeVaga usoDeVaga) {
-        this.usoDeVaga = usoDeVaga;
-    }
-
-    public Date getDataEntrada() {
-        return dataEntrada;
+        return historicoVagas.size();
     }
 }

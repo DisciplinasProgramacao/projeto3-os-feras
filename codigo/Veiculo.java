@@ -1,16 +1,20 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Date;
+
 public class Veiculo {
     private String placa;
-    private UsodeVaga[] usos;
+    private List<HistoricoVaga> historicoVagas; // Lista para armazenar o histórico
 
     public Veiculo(String placa) {
         this.placa = placa;
-        this.usos = new UsodeVaga[500];
+        this.historicoVagas = new ArrayList<>();
     }
 
     public void estacionar(Vaga vaga) throws VeiculoException {
-        for (int i = 0; i < usos.length; i++) {
-            if (usos[i] == null) {
-                usos[i] = new UsoDeVaga(vaga);
+        for (HistoricoVaga historico : historicoVagas) {
+            if (historico.getUsoDeVaga() == null) {
+                historico.setUsoDeVaga(new UsoDeVaga(vaga));
                 return; // Estacionamento bem-sucedido, retornar sem exceção
             }
         }
@@ -19,10 +23,13 @@ public class Veiculo {
 
     public double sair() {
         double total = 0;
-        for (int i = 0; i < usos.length; i++) {
-            if (usos[i] != null) {
-                total += usos[i].getVaga().getValorPago();
-                usos[i] = null;
+        for (HistoricoVaga historico : historicoVagas) {
+            UsoDeVaga uso = historico.getUsoDeVaga();
+            if (uso != null) {
+                total += uso.getVaga().getValorPago();
+                uso.getVaga().setValorPago(0); // Zerar o valor da vaga após a saída
+                uso.setDataSaida(new Date()); // Registrar a data de saída
+                historico.setUsoDeVaga(null); // Remover o uso da vaga do histórico
             }
         }
         return total;
@@ -30,9 +37,10 @@ public class Veiculo {
 
     public double totalArrecadado() {
         double total = 0;
-        for (int i = 0; i < usos.length; i++) {
-            if (usos[i] != null) {
-                total += usos[i].getVaga().getValorPago();
+        for (HistoricoVaga historico : historicoVagas) {
+            UsoDeVaga uso = historico.getUsoDeVaga();
+            if (uso != null) {
+                total += uso.getVaga().getValorPago();
             }
         }
         return total;
@@ -40,9 +48,10 @@ public class Veiculo {
 
     public double arrecadadoNoMes(int mes) {
         double total = 0;
-        for (int i = 0; i < usos.length; i++) {
-            if (usos[i] != null && usos[i].getVaga().getMes() == mes) {
-                total += usos[i].getVaga().getValorPago();
+        for (HistoricoVaga historico : historicoVagas) {
+            UsoDeVaga uso = historico.getUsoDeVaga();
+            if (uso != null && uso.getVaga().getMes() == mes) {
+                total += uso.getVaga().getValorPago();
             }
         }
         return total;
@@ -50,11 +59,33 @@ public class Veiculo {
 
     public int totalDeUsos() {
         int total = 0;
-        for (int i = 0; i < usos.length; i++) {
-            if (usos[i] != null) {
+        for (HistoricoVaga historico : historicoVagas) {
+            if (historico.getUsoDeVaga() != null) {
                 total++;
             }
         }
         return total;
+    }
+}
+
+class HistoricoVaga {
+    private UsoDeVaga usoDeVaga;
+    private Date dataEntrada;
+
+    public HistoricoVaga() {
+        this.usoDeVaga = null;
+        this.dataEntrada = new Date();
+    }
+
+    public UsoDeVaga getUsoDeVaga() {
+        return usoDeVaga;
+    }
+
+    public void setUsoDeVaga(UsoDeVaga usoDeVaga) {
+        this.usoDeVaga = usoDeVaga;
+    }
+
+    public Date getDataEntrada() {
+        return dataEntrada;
     }
 }

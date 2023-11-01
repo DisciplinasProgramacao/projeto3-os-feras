@@ -3,25 +3,27 @@ import java.time.LocalDate;
 import java.util.Scanner;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Estacionamento {
 
 	static Scanner teclado = new Scanner(System.in);
 	private String nome;
-	private LinkedList<Cliente> id;
+	private HashMap<Cliente, Vaga> clientesEstacionados;
 	private Vaga[] vagas;
 	private int quantFileiras;
 	private int vagasPorFileira;
 
 	
 	public Estacionamento(String nome, int fileiras, int vagasPorFila) {
-		this.nome = nome;
-		this.quantFileiras = fileiras;
-		this.vagasPorFileira = vagasPorFila;
-		id = new LinkedList<>();
-		gerarVagas();
-	}
+        this.nome = nome;
+        this.quantFileiras = fileiras;
+        this.vagasPorFileira = vagasPorFila;
+        id = new LinkedList<>();
+        gerarVagas();
+        clientesEstacionados = new HashMap<>();
+    }
 
 	
 	public void addVeiculo(String placa, String idCli) throws ExcecaoVeiculoJaCadastrado {
@@ -32,7 +34,6 @@ public class Estacionamento {
 				break;
 			}
 		}
-
 		if (clienteEncontrado.possuiVeiculo(placa)) {
 			throw new ExcecaoVeiculoJaCadastrado("Veículo já cadastrado para este cliente");
 		} else {
@@ -42,7 +43,6 @@ public class Estacionamento {
 
 
 	public void addCliente(Cliente cliente) throws ExcecaoClienteJaCadastrado {
-
 		Cliente clienteEncontrado = null;
 		for (Cliente c : id) {
 			if (cliente.equals(c.getId())) {
@@ -107,7 +107,6 @@ public class Estacionamento {
 			}
 		}
 
-		// Agora topClientes contém os 5 principais clientes
 		String[] nomesTopClientes = new String[5];
 		for (int i = 0; i < 5; i++) {
 			if (topClientes[i] != null) {
@@ -119,25 +118,28 @@ public class Estacionamento {
 	}
 
 	
-	public void estacionar(String placa) {
-		Veiculo veiculo = null;
+	public void estacionar(String placa, Cliente cliente) {
+        Veiculo veiculo = null;
 
-		for (Cliente cliente : id) {
-			if (cliente.possuiVeiculo(placa)) {
-				veiculo = cliente.getVeiculo(placa);
-				break;
-			}
-		}
+        for (Cliente c : id) {
+            if (c.equals(cliente)) {
+                if (c.possuiVeiculo(placa)) {
+                    veiculo = c.getVeiculo(placa);
+                    break;
+                }
+            }
+        }
 
-		if (veiculo != null) {
-			for (Vaga vaga : vagas) {
-				if (vaga.disponivel()) {
-					veiculo.estacionar(vaga);
-					break;
-				}
-			}
-		}
-	}
+        if (veiculo != null) {
+            for (Vaga vaga : vagas) {
+                if (vaga.disponivel()) {
+                    veiculo.estacionar(vaga);
+                    clientesEstacionados.put(cliente, vaga); 
+                    break;
+                }
+            }
+        }
+    }
 
 	
 	public double sair(String placa) {
@@ -183,6 +185,4 @@ public class Estacionamento {
 	public int getVagasPorFileira() {
 		return vagasPorFileira;
 	}
-
-
 }

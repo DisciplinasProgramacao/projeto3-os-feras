@@ -1,14 +1,17 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cliente {
     private String nome;
     private String id;
     private ArrayList<Veiculo> veiculos;
+    private List<String> historico;
 
     public Cliente(String nome, String id) {
         this.nome = nome;
         this.id = id;
         this.veiculos = new ArrayList<>();
+        this.historico = new ArrayList<>();
     }
 
     public void addVeiculo(Veiculo veiculo) {
@@ -54,5 +57,13 @@ public class Cliente {
             total += veiculo.getArrecadacaoNoMes(mes);
         }
         return total;
+    }
+
+    public void adicionarAoHistorico(String atividade) {
+        historico.add(atividade);
+    }
+
+    public List<String> getHistorico() {
+        return historico;
     }
 }

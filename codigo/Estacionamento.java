@@ -17,13 +17,14 @@ public class Estacionamento {
 
 	
 	public Estacionamento(String nome, int fileiras, int vagasPorFila) {
-        this.nome = nome;
-        this.quantFileiras = fileiras;
-        this.vagasPorFileira = vagasPorFila;
-        id = new LinkedList<>();
-        gerarVagas();
-        clientesEstacionados = new HashMap<>();
-    }
+    this.nome = nome;
+    this.quantFileiras = fileiras;
+    this.vagasPorFileira = vagasPorFila;
+    id = new LinkedList<>();
+    gerarVagas();
+    clientesEstacionados = new HashMap<>();
+}
+
 
 	
 	public void addVeiculo(String placa, String idCli) throws ExcecaoVeiculoJaCadastrado {
@@ -119,27 +120,28 @@ public class Estacionamento {
 
 	
 	public void estacionar(String placa, Cliente cliente) {
-        Veiculo veiculo = null;
+    Veiculo veiculo = null;
 
-        for (Cliente c : id) {
-            if (c.equals(cliente)) {
-                if (c.possuiVeiculo(placa)) {
-                    veiculo = c.getVeiculo(placa);
-                    break;
-                }
-            }
-        }
-
-        if (veiculo != null) {
-            for (Vaga vaga : vagas) {
-                if (vaga.disponivel()) {
-                    veiculo.estacionar(vaga);
-                    clientesEstacionados.put(cliente, vaga); 
-                    break;
-                }
+    for (Cliente c : id) {
+        if (c.equals(cliente)) {
+            if (c.possuiVeiculo(placa)) {
+                veiculo = c.getVeiculo(placa);
+                break;
             }
         }
     }
+
+    if (veiculo != null) {
+        for (Vaga vaga : vagas) {
+            if (vaga.disponivel()) {
+                veiculo.estacionar(vaga);
+                clientesEstacionados.put(cliente, vaga); 
+                break;
+            }
+        }
+    }
+}
+
 
 	
 	public double sair(String placa) {

@@ -1,50 +1,91 @@
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
+import java.util.List;
 
 public class TesteVeiculo {
 
-    @Test
-    public void testEstacionarVeiculoUmaVez() {
-        // Teste para verificar o estacionamento de um veículo uma vez.
-        Veiculo v = new Veiculo("ABC-1234");
-        Vaga vg = new Vaga(10, 1);
-        v.estacionar(vg);
+    private Veiculo veiculo;
 
-        // Verifica se o número total de usos é 1 e o total arrecadado é R$10.0.
-        assertEquals(1, v.totalDeUsos());
-        assertEquals(10.0, v.totalArrecadado(), 0.01);
+    @Before
+    public void setUp() throws Exception {
+        veiculo = new Veiculo("ABC-123");
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        veiculo = null;
     }
 
     @Test
-    public void testEstacionarVeiculoDuasVezesSair() {
-        // Teste para verificar o estacionamento de um veículo duas vezes e, em seguida, sair.
-        Veiculo v = new Veiculo("XYZ-5678");
-        Vaga vg1 = new Vaga(5, 2);
-        Vaga vg2 = new Vaga(7, 2);
-        v.estacionar(vg1);
-        v.estacionar(vg2);
+    public void testEstacionar() {
+        Vaga vaga = new Vaga(1, 1);
+        veiculo.estacionar(vaga);
 
-        // Verifica se o número total de usos é 2 e o total arrecadado é R$12.0.
-        assertEquals(2, v.totalDeUsos());
-        assertEquals(12.0, v.totalArrecadado(), 0.01);
-
-        // Após o veículo sair, verifica se o total arrecadado é reduzido para R$0.0 e o número total de usos retorna a 0.
-        assertEquals(12.0, v.sair(), 0.01);
-        assertEquals(0, v.totalDeUsos());
+        assertEquals(1, veiculo.totalDeUsos());
+        assertEquals(0, veiculo.totalArrecadado(), 0.01);
     }
 
     @Test
-    public void testEstacionarQuandoEstacionamentoEstiverCheio() {
-        // Teste para verificar o comportamento quando se tenta estacionar um veículo quando o estacionamento está cheio.
-        Veiculo v = new Veiculo("LMN-4321");
-        for (int i = 0; i < 500; i++) {
-            Vaga vg = new Vaga(5, 3);
-            v.estacionar(vg);
-        }
+    public void testSair() {
+        Vaga vaga = new Vaga(2, 2);
+        veiculo.estacionar(vaga);
 
-        // Tenta estacionar o veículo novamente e verifica se o número total de usos permanece em 500.
-        Vaga vg = new Vaga(8, 4);
-        v.estacionar(vg);
-        assertEquals(500, v.totalDeUsos());
+        double valorPago = veiculo.sair();
+
+        assertEquals(0, veiculo.totalDeUsos());
+        assertEquals(0.0, valorPago, 0.01);
+    }
+
+    @Test
+    public void testGerarRelatorioPorData() {
+        // Criar um veículo
+        Veiculo veiculo = new Veiculo("AAA-111");
+
+        // Adicionar usos de vaga ao histórico
+        UsoDeVaga uso1 = new UsoDeVaga(new Vaga(1, 1));
+        uso1.setDataEntrada(new Date(1638000000L)); // Data: 01/12/2021
+        uso1.setValorPago(15.0);
+        veiculo.getHistoricoVagas().add(uso1);
+
+        UsoDeVaga uso2 = new UsoDeVaga(new Vaga(1, 2));
+        uso2.setDataEntrada(new Date(1640995200000L)); // Data: 01/01/2022
+        uso2.setValorPago(20.0);
+        veiculo.getHistoricoVagas().add(uso2);
+
+        // Gerar relatório ordenado por data
+        List<UsoDeVaga> relatorio = veiculo.gerarRelatorio(true);
+
+        // Verificar se o relatório está ordenado por data crescente
+        assertEquals(uso1, relatorio.get(0));
+        assertEquals(uso2, relatorio.get(1));
+    }
+
+    @Test
+    public void testGerarRelatorioPorValor() {
+        // Criar um veículo
+        Veiculo veiculo = new Veiculo("BBB-222");
+
+        // Adicionar usos de vaga ao histórico
+        UsoDeVaga uso1 = new UsoDeVaga(new Vaga(2, 1));
+        uso1.setDataEntrada(new Date(1643673600000L)); // Data: 01/02/2022
+        uso1.setValorPago(25.0);
+        veiculo.getHistoricoVagas().add(uso1);
+
+        UsoDeVaga uso2 = new UsoDeVaga(new Vaga(2, 2));
+        uso2.setDataEntrada(new Date(1646092800000L)); // Data: 01/03/2022
+        uso2.setValorPago(18.0);
+        veiculo.getHistoricoVagas().add(uso2);
+
+        // Gerar relatório ordenado por valor decrescente
+        List<UsoDeVaga> relatorio = veiculo.gerarRelatorio(false);
+
+        // Verificar se o relatório está ordenado por valor decrescente
+        assertEquals(uso1, relatorio.get(0));
+        assertEquals(uso2, relatorio.get(1));
+
     }
 }

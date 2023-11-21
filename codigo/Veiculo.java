@@ -15,54 +15,59 @@ public class Veiculo implements Serializable {
         this.dataEntrada = new Date();
     }
 
-   public void estacionar(Vaga vaga) {
-        UsoDeVaga uso = new UsoDeVaga(vaga);
-        usos.add(uso);
-    }
+  public void estacionar(Vaga vaga) {
+    UsoDeVaga uso = new UsoDeVaga(vaga);
+    historicoVagas.add(uso);
+}
 
-    public double sair() {
-        double totalArrecadado = 0.0;
-        Date dataSaida = new Date();
 
-        for (UsoDeVaga uso : usos) {
-            Vaga vaga = uso.getVaga();
-            if (vaga != null) {
-                vaga.setValorPago(0);
-                uso.setDataSaida(dataSaida);
-                totalArrecadado += vaga.getValorPago();
-            }
+    public double sair(String placa) {
+    double totalArrecadado = 0.0;
+    Date dataSaida = new Date();
+
+    for (UsoDeVaga uso : historicoVagas) {
+        Vaga vaga = uso.getVaga();
+        if (vaga != null && vaga.getVeiculo().getPlaca().equals(placa)) {
+            vaga.setValorPago(0);
+            uso.setDataSaida(dataSaida);
+            totalArrecadado += vaga.getValorPago();
         }
-
-        usos.clear();
-
-        return totalArrecadado;
     }
 
-    public double totalArrecadado() {
-        double total = 0.0;
-        for (UsoDeVaga uso : usos) {
-            Vaga vaga = uso.getVaga();
-            if (vaga != null) {
-                total += vaga.getValorPago();
-            }
+    historicoVagas.removeIf(uso -> uso.getVaga().getVeiculo().getPlaca().equals(placa));
+
+    return totalArrecadado;
+}
+
+
+   public double totalArrecadado() {
+    double total = 0.0;
+    for (UsoDeVaga uso : historicoVagas) {
+        Vaga vaga = uso.getVaga();
+        if (vaga != null) {
+            total += vaga.getValorPago();
         }
-        return total;
     }
+    return total;
+}
 
-    public double arrecadadoNoMes(int mes) {
-        double total = 0.0;
-        for (UsoDeVaga uso : usos) {
-            Vaga vaga = uso.getVaga();
-            if (vaga != null && vaga.getMes() == mes) {
-                total += vaga.getValorPago();
-            }
+
+   public double arrecadadoNoMes(int mes) {
+    double total = 0.0;
+    for (UsoDeVaga uso : historicoVagas) {
+        Vaga vaga = uso.getVaga();
+        if (vaga != null && vaga.getMes() == mes) {
+            total += vaga.getValorPago();
         }
-        return total;
     }
+    return total;
+}
+
 
     public int totalDeUsos() {
-        return usos.size();
-    }
+    return historicoVagas.size();
+}
+
 
     public String getPlaca() {
         return placa;

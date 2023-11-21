@@ -162,10 +162,6 @@ public class EstacionamentoTeste {
         try {
             estacionamento.addCliente(cliente);
             estacionamento.estacionar("ABC123", cliente);
-
-            // Adicione os testes específicos que você deseja para o método estacionar
-
-            // Exemplo: assertTrue(veiculo.foiEstacionado()); ou algo assim
         } catch (ExcecaoClienteJaCadastrado | ExcecaoVeiculoJaCadastrado e) {
             fail("Exceção inesperada: " + e.getMessage());
         }

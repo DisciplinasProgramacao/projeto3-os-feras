@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 /**
  * A classe Estacionamento representa um estacionamento com vagas e clientes.
@@ -196,3 +197,25 @@ public class Estacionamento {
      * Método para calcular o total arrecadado pelo estacionamento.
      * 
      * @return Total arrecadado pelo estacionamento
+     */
+    public double arrecadacaoNoMes(int mes) {
+		double total = 0.0;
+
+		for (Cliente cliente : id) {
+			total = total + cliente.arrecadadoNoMes(mes);
+		}
+		return total;
+	}
+
+
+	public String getNome() {
+		return this.nome;
+	}
+
+
+	public void mostrarVagas(){
+		for(int i =0; i < vagas.length; i++){
+			System.out.println(i + "- status: "+ vagas[i].disponivel());
+		}
+	}
+}

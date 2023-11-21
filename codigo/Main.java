@@ -15,7 +15,8 @@ public class Main {
             System.out.println("2 - Sair do estacionamento");
             System.out.println("3 - Consultar vagas disponíveis");
             System.out.println("4 - Consultar valor da hora");
-            System.out.println("5 - Sair do app");
+            System.out.println("5 - Consultar relatório de uso por veículo");
+            System.out.println("6 - Sair do app");
 
             escolha = scanner.nextInt();
             scanner.nextLine(); // Limpar a quebra de linha após a leitura do número
@@ -38,6 +39,10 @@ public class Main {
                     break;
 
                 case 5:
+                    consultarRelatorioPorVeiculo(scanner, estacionamento);
+                    break;
+
+                case 6:
                     System.out.println("Obrigado por usar o app de estacionamento!");
                     break;
 
@@ -45,7 +50,7 @@ public class Main {
                     System.out.println("Escolha inválida. Tente novamente.");
                     break;
             }
-        } while (escolha != 5);
+        } while (escolha != 6);
 
         scanner.close();
     }
@@ -75,9 +80,12 @@ public class Main {
     private static void saidaEstacionamento(Scanner scanner, Estacionamento estacionamento) {
         System.out.println("Digite a placa do veículo:");
         String placaVeiculo = scanner.nextLine();
-        estacionamento.sair(placaVeiculo);
-             System.out.println("O veículo com a placa " + placaVeiculo + " não está no estacionamento.");
-         }
+        try {
+            double valorPago = estacionamento.sair(placaVeiculo);
+            System.out.println("O veículo com a placa " + placaVeiculo + " saiu do estacionamento. Valor pago: R$" + valorPago);
+        } catch (UsoDeVagaException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private static void consultarVagasDisponiveis(Estacionamento estacionamento) {
@@ -102,6 +110,24 @@ public class Main {
             } else {
                 System.out.println("A vaga " + idVaga + " não existe no estacionamento.");
             }
+        }
+    }
+
+    private static void consultarRelatorioPorVeiculo(Scanner scanner, Estacionamento estacionamento) {
+        System.out.println("Digite a placa do veículo para consultar o relatório:");
+        String placaVeiculo = scanner.nextLine();
+
+        Veiculo veiculo = estacionamento.buscarVeiculo(placaVeiculo);
+
+        if (veiculo != null) {
+            System.out.println("Relatório de uso para o veículo com placa " + placaVeiculo + ":");
+            List<UsoDeVaga> relatorio = veiculo.gerarRelatorio(true);
+
+            for (UsoDeVaga uso : relatorio) {
+                System.out.println("Data de entrada: " + uso.getDataEntrada() + ", Valor pago: R$" + uso.getValorPago());
+            }
+        } else {
+            System.out.println("Veículo com placa " + placaVeiculo + " não encontrado no estacionamento.");
         }
     }
 }

@@ -1,0 +1,77 @@
+class Cliente {
+    + nome: String
+    + id: String
+    + categoria: String
+    + veiculos: ArrayList<Veiculo>
+    + historico: List<String>
+
+    + Cliente(nome: String, id: String, categoria: String)
+    + addVeiculo(veiculo: Veiculo): void
+    + possuiVeiculo(placa: String): Veiculo
+    + totalDeUsos(): int
+    + arrecadadoPorVeiculo(placa: String): double
+    + arrecadidoTotal(): double
+    + arrecadidoNoMes(mes: int): double
+    + adicionarAoHistorico(atividade: String): void
+    + getHistorico(): List<String>
+    + getCategoria(): String
+}
+
+class Veiculo {
+    + placa: String
+    + numUsos: int
+    + arrecadacao: double
+    + arrecadacaoPorMes: double[]
+
+    + Veiculo(placa: String)
+    + getNumUsos(): int
+    + getArrecadacao(): double
+    + getArrecadacaoNoMes(mes: int): double
+}
+
+class Estacionamento {
+    + nome: String
+    + clientesEstacionados: HashMap<Cliente, Vaga>
+    + vagas: Vaga[]
+    + quantFileiras: int
+    + vagasPorFileira: int
+    + clientes: LinkedList<Cliente>
+
+    + Estacionamento(nome: String, fileiras: int, vagasPorFila: int)
+    + categorizarCliente(cliente: Cliente, turno: String): void
+    + calcularValor(cliente: Cliente, turno: String): double
+    + gerarVagas(): void
+    + valorMedioPorUso(): double
+    + top5Clientes(mes: int): String
+    + estacionar(placa: String, cliente: Cliente, turno: String): void
+    + sair(placa: String): double
+    + totalArrecadado(): double
+    + adicionarCliente(cliente: Cliente): void
+}
+
+class Vaga {
+    + fila: char
+    + numero: int
+    + ocupada: boolean
+
+    + Vaga(fila: char, numero: int)
+    + disponivel(): boolean
+}
+
+class UsoDeVaga {
+    + veiculo: Veiculo
+    + vaga: Vaga
+    + turno: String
+
+    + UsoDeVaga(veiculo: Veiculo, vaga: Vaga, turno: String)
+}
+
+Cliente -- Veiculo : possui
+Cliente "1" -- "0..*" Estacionamento : estacionado
+Estacionamento "1" -- "0..*" Cliente : clientesEstacionados
+Estacionamento "1" -- "0..*" Vaga : vagas
+Estacionamento "1" -- "0..*" LinkedList<Cliente> : clientes
+UsoDeVaga "1" -- "1" Veiculo : veiculo
+UsoDeVaga "1" -- "1" Vaga : vaga
+Estacionamento "1" -- "0..*" UsoDeVaga : usos
+

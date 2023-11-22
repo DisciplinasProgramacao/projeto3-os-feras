@@ -1,0 +1,19 @@
++-------------------+
+|   Estacionamento   |
++-------------------+
+| - nome: string   |
+| - quantFileiras: int |
+| - vagasPorFileira: int |
+| - clientes: List<Cliente> |
+| - vagas: Vaga[] |
+| - clientesEstacionados: HashMap<Cliente, Vaga> |
+| - constructor(): void |
+| - categorizarCliente(Cliente, String): void |
+| - calcularValor(Cliente, String): double |
+| - gerarVagas(): void |
+| - valorMedioPorUso(): double |
+| - top5Clientes(int): String |
+| - estacionar(string, Cliente, String): void |
+| - sair(string): double |
+| - totalArrecadado(): double |
+| - adicionarCliente(Cliente): void

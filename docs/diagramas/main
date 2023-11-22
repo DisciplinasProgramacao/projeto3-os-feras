@@ -1,0 +1,62 @@
+@startuml
+!define AWSPU()
+!define AWSP() AWS_Procedures
+
+!define COLORS()
+skinparam ClassFontColor black
+skinparam ClassBackgroundColor LightBlue
+skinparam ArrowColor black
+
+skinparam class {
+    FontColor <<COLORS>>
+    BackgroundColor <<COLORS>>
+}
+
+:main: <<AWSClient>>
+
+class :Cliente: <<COLORS>> {
+    +nomeCliente: String
+    +veiculo: Veiculo
+
+    +Cliente(nomeCliente: String, veiculo: Veiculo)
+    +getNomeCliente(): String
+    +getVeiculo(): Veiculo
+}
+
+class :Veiculo: <<COLORS>> {
+    +placa: String
+    +tipo: String
+
+    +Veiculo(placa: String, tipo: String)
+    +getPlaca(): String
+    +getTipo(): String
+}
+
+class :Estacionamento: <<COLORS>> {
+    +vagas: List<Vaga>
+    +valorHora: double
+
+    +Estacionamento(vagas: List<Vaga>, valorHora: double)
+    +estacionar(cliente: Cliente): boolean
+    +sair(placaVeiculo: String)
+    +getVagasDisponiveis(): int
+    +getValorHora(): double
+    +buscarVaga(idVaga: String): Vaga
+}
+
+class :Vaga: <<COLORS>> {
+    +id: String
+    +veiculo: Veiculo
+    +valorHora: double
+
+    +Vaga(id: String, veiculo: Veiculo, valorHora: double)
+    +getId(): String
+    +getVeiculo(): Veiculo
+    +getValorHora(): double
+}
+
+main -right- Estacionamento
+main -down-> Cliente
+main -down-> Veiculo
+main -down-> Vaga
+@enduml

@@ -1,0 +1,40 @@
+@startuml
+class UsoDeVaga {
+ -private static final double FRACAO_USO = 0.25
+ -private static final double VALOR_FRACAO = 4.0
+ -private static final double VALOR_MAXIMO = 50.0
+ -Vaga vaga
+ -LocalDateTime entrada
+ -LocalDateTime saida
+ -double valorPago
+ -Servico servico
+
+ +UsoDeVaga(Vaga vaga) throws UsoDeVagaException
+ +UsoDeVaga(Vaga vaga, Servico servico) throws UsoDeVagaException
+ +sair() throws UsoDeVagaException
+ +valorPago()
+}
+
+class Vaga {
+ -private boolean ocupada
+ -private String identificacao
+ +Vaga(String identificacao)
+ +boolean isOcupada()
+ +setOcupada(boolean ocupada)
+}
+
+class Servico {
+ -private double precoPorHora
+ -private String nome
+ +Servico(String nome, double precoPorHora)
+ +double getPrecoPorHora()
+}
+
+class UsoDeVagaException {
+ -private String message
+ +UsoDeVagaException(String message)
+}
+
+UsoDeVaga "1" -- "1" Vaga : uso
+UsoDeVaga "1" -- "1" Servico : escolhe
+@enduml

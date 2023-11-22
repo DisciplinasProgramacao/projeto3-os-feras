@@ -50,13 +50,13 @@ public class Estacionamento {
                 break;
             }
         }
-        if (clienteEncontrado.possuiVeiculo(placa)) {
+        if (clienteEncontrado != null && clienteEncontrado.possuiVeiculo(placa) != null) {
             throw new ExcecaoVeiculoJaCadastrado("Veículo já cadastrado para este cliente");
         } else {
             clienteEncontrado.addVeiculo(new Veiculo(placa));
         }
     }
-
+    
     /**
      * Método para adicionar um cliente.
      * 
@@ -154,17 +154,8 @@ public class Estacionamento {
      * @param cliente Cliente que está estacionando o veículo.
      */
     public void estacionar(String placa, Cliente cliente) {
-        Veiculo veiculo = null;
-
-        for (Cliente c : id) {
-            if (c.equals(cliente)) {
-                if (c.possuiVeiculo(placa)) {
-                    veiculo = c.getVeiculo(placa);
-                    break;
-                }
-            }
-        }
-
+        Veiculo veiculo = cliente.possuiVeiculo(placa);
+    
         if (veiculo != null) {
             for (Vaga vaga : vagas) {
                 if (vaga.disponivel()) {
@@ -175,30 +166,24 @@ public class Estacionamento {
             }
         }
     }
-
-    /**
-     * Método para registrar a saída de um veículo do estacionamento e obter o valor a ser pago.
-     * 
-     * @param placa Placa do veículo.
-     * @return Valor a ser pago pelo cliente.
-     */
+    
     public double sair(String placa) {
-
         for (Cliente cliente : id) {
-            if (cliente.possuiVeiculo(placa)) {
-                return cliente.getVeiculo(placa).sair(placa);
+            Veiculo veiculo = cliente.possuiVeiculo(placa);
+            if (veiculo != null) {
+                return veiculo.sair();
             }
         }
-
+    
         return 0.0;
     }
 
     /**
      * Método para calcular o total arrecadado pelo estacionamento.
      * 
-     * @return Total arrecadado pelo estacionamento
-     */
-    public double arrecadacaoNoMes(int mes) {
+     * @return Total arrecadado pelo estacionamento*/
+     
+      public double arrecadacaoNoMes(int mes) {
 		double total = 0.0;
 
 		for (Cliente cliente : id) {

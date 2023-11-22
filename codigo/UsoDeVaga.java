@@ -11,9 +11,10 @@ public class UsoDeVaga {
 	private LocalDateTime saida;
 	private double valorPago;
 	private Servico servico; //novo atributo
+	private Cliente cliente; //novo atributo
 
 	//construtor original
-	public UsoDeVaga(Vaga vaga) throws UsoDeVagaException {
+	public UsoDeVaga(Vaga vaga, Cliente cliente) throws UsoDeVagaException {
         //verificar se a vaga está ocupada
         if (vaga.isOcupada()) {
             //lançar uma exceção com a mensagem adequada
@@ -24,12 +25,13 @@ public class UsoDeVaga {
 		this.saida=null;
 		this.valorPago=0.0;
 		this.servico=null; //sem serviço
+		this.cliente=cliente; //atribuir o cliente
 
 	}
 
 	//construtor sobrecarregado que recebe um serviço
-	public UsoDeVaga(Vaga vaga, Servico servico) throws UsoDeVagaException {
-		this(vaga); //chamar o construtor original
+	public UsoDeVaga(Vaga vaga, Cliente cliente, Servico servico) throws UsoDeVagaException {
+		this(vaga, cliente); //chamar o construtor original
 		this.servico=servico; //atribuir o serviço
 	}
 
@@ -64,6 +66,15 @@ public class UsoDeVaga {
         //se o tempo de uso for maior que uma fração, cobrar por cada fração usada até o valor máximo
         else {
             this.valorPago += Math.min((tempo / FRACAO_USO) * VALOR_FRACAO, VALOR_MAXIMO);
+        }
+
+        //se o cliente for de turno e estiver no seu turno, não cobrar nada
+        if (cliente.getTurno().equals("turno") && cliente.getTurno().isInTurno(entrada, saida)) {
+            this.valorPago = 0.0;
+        }
+        //se o cliente for mensalista, não cobrar nada
+        else if (cliente.getTurno().equals("mensalista")) {
+            this.valorPago = 0.0;
         }
 
         return this.valorPago;

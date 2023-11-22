@@ -171,7 +171,7 @@ public class Estacionamento {
         for (Cliente cliente : id) {
             Veiculo veiculo = cliente.possuiVeiculo(placa);
             if (veiculo != null) {
-                return veiculo.sair();
+                return veiculo.sair(placa);
             }
         }
     

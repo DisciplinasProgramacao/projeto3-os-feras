@@ -10,7 +10,7 @@ public class TesteCliente {
 
     @Before
     public void setUp() {
-        cliente = new Cliente("John Doe", "123456");
+        cliente = new Cliente("John Doe", "123456", "horista");
         veiculo1 = new Veiculo("ABC-1234", "Ford", "Fiesta", 2015, 100.0);
         veiculo2 = new Veiculo("DEF-5678", "Chevrolet", "Onix", 2018, 150.0);
     }
@@ -69,5 +69,32 @@ public class TesteCliente {
         assertEquals(150.0, cliente.arrecadadoNoMes(10), 0.0);
         assertEquals(200.0, cliente.arrecadadoNoMes(11), 0.0);
         assertEquals(0.0, cliente.arrecadadoNoMes(12), 0.0);
+    }
+
+    @Test
+    public void testCliente() {
+        Cliente cliente = new Cliente("João", "123", "horista");
+        assertEquals("João", cliente.getNome());
+        assertEquals("123", cliente.getId());
+        assertEquals("horista", cliente.getCategoria());
+        assertNull(cliente.getTurno());
+
+        Cliente clienteTurno = new Cliente("Maria", "456", "turno", Turno.MANHA);
+        assertEquals("Maria", clienteTurno.getNome());
+        assertEquals("456", clienteTurno.getId());
+        assertEquals("turno", clienteTurno.getCategoria());
+        assertEquals(Turno.MANHA, clienteTurno.getTurno());
+    }
+
+    @Test
+    public void testMensalidade() {
+        Cliente clienteHorista = new Cliente("João", "123", "horista");
+        assertEquals(0.0, clienteHorista.getMensalidade(), 0.0);
+
+        Cliente clienteTurno = new Cliente("Maria", "456", "turno", Turno.MANHA);
+        assertEquals(200.0, clienteTurno.getMensalidade(), 0.0);
+
+        Cliente clienteMensalista = new Cliente("Ana", "789", "mensalista");
+        assertEquals(500.0, clienteMensalista.getMensalidade(), 0.0);
     }
 }

@@ -1,0 +1,35 @@
+classDiagram
+    class Cliente {
+        +String nome
+        +String id
+        +String categoria
+        +ArrayList<Veiculo> veiculos
+        +List<String> historico
+
+        +Cliente(String nome, String id, String categoria)
+
+        +void addVeiculo(Veiculo veiculo)
+        +Veiculo possuiVeiculo(String placa)
+        +int totalDeUsos()
+        +double arrecadadoPorVeiculo(String placa)
+        +double arrecadadoTotal()
+        +double arrecadadoNoMes(int mes)
+        +void adicionarAoHistorico(String atividade)
+        +List<String> getHistorico()
+        +String getCategoria()
+    }
+
+    class Veiculo {
+        +String placa
+        +int numUsos
+        +double arrecadacao
+        +double[] arrecadacaoPorMes
+
+        +Veiculo(String placa)
+
+        +int getNumUsos()
+        +double getArrecadacao()
+        +double getArrecadacaoNoMes(int mes)
+    }
+
+    Cliente "1" -- "0..*" Veiculo : possui veiculo

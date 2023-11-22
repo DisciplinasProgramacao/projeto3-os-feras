@@ -1,0 +1,22 @@
++-------------------+
+|   Veiculo     |
++-------------------+
+| - placa: String  |
+| - historicoVagas: List<UsoDeVaga> |
+| - dataEntrada: Date       |
+| - estacionar(): void      |
+| - sair(): double         |
+| - totalArrecadado(): double      |
+| - arrecadadoNoMes(int): double     |
+| - totalDeUsos(): int          |
++-------------------+
+
+                  |
+                  |
+                  v
++-------------------+
+|   UsoDeVaga     |
++-------------------+
+| - vaga: Vaga     |
+| - servico: Servico |
+| - dataEntrada: Date

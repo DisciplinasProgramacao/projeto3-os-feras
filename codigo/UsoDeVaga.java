@@ -49,36 +49,6 @@ public class UsoDeVaga {
 	}
 
 	//retornar valor pago pelo uso da vaga
-	public double valorPago() {
-		
-        //calcular o tempo de uso da vaga em horas
-        long tempo = ChronoUnit.HOURS.between(entrada, saida);
-
-        //se houver um serviço escolhido, adicionar o seu preço ao valor pago
-        if (servico != null) {
-            this.valorPago += servico.getPrecoPorHora();
-        }
-
-        //se o tempo de uso for menor que uma fração, cobrar apenas a fração
-        if (tempo < FRACAO_USO) {
-            this.valorPago += VALOR_FRACAO;
-        }
-        //se o tempo de uso for maior que uma fração, cobrar por cada fração usada até o valor máximo
-        else {
-            this.valorPago += Math.min((tempo / FRACAO_USO) * VALOR_FRACAO, VALOR_MAXIMO);
-        }
-
-        //se o cliente for de turno e estiver no seu turno, não cobrar nada
-        if (cliente.getTurno().equals("turno") && cliente.getTurno().isInTurno(entrada, saida)) {
-            this.valorPago = 0.0;
-        }
-        //se o cliente for mensalista, não cobrar nada
-        else if (cliente.getTurno().equals("mensalista")) {
-            this.valorPago = 0.0;
-        }
-
-        return this.valorPago;
-
-    }
+	 public abstract double valorPago();
 
 }
